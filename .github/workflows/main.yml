@@ -2,7 +2,7 @@ name: xiaomi_r3p
 
 on:
   schedule:
-    - cron: 40 8 * * *
+    - cron: 41 12 * * *
 #  push:
 #    branches: 
 #      - master
