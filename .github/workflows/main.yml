@@ -29,7 +29,7 @@ jobs:
         REPO_URL: https://github.com/coolsnowwolf/lede.git
         REPO_BRANCH: master
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
-    - name: add new feed from lienol:
+    - name: Add new feed from lienol
       run: cd lede && sed '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
     - name: Update feeds
       run: cd lede && ./scripts/feeds update -a
