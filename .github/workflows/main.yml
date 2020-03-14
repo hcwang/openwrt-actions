@@ -30,32 +30,32 @@ jobs:
         REPO_BRANCH: master
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
     - name: Add new feed from lienol
-      run: cd lede && sed '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
+      run: cd openwrt && sed '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
     - name: Update feeds
-      run: cd lede && ./scripts/feeds update -a
+      run: cd openwrt && ./scripts/feeds update -a
 
     - name: Install feeds
-      run: cd lede && ./scripts/feeds install -a
+      run: cd openwrt && ./scripts/feeds install -a
     
     - name: Costom configure file
       run: |
-          cd lede
+          cd openwrt
           rm -f .config
           cp ../xiaomi_r3p .config
           
     - name: Make Defconfig
       run: |
-          cd lede
+          cd openwrt
           make defconfig
     - name: Make download
       run: |
-          cd lede
+          cd openwrt
           make download -j8
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
     - name: Multi-thread compile
       run: |
-          cd lede
+          cd openwrt
           echo -e "$(nproc) thread build."
           make -j$(nproc) V=s
     - name: Single-thread compile
@@ -67,7 +67,7 @@ jobs:
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
-          find lede/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
           
     - name: Upload artifact
       uses: actions/upload-artifact@master
