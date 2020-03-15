@@ -74,3 +74,15 @@ jobs:
       with:
         name: OpenWrt firmware
         path: ./artifact/
+    
+    - name: Copy single file to remote
+      uses: garygrossgarten/github-action-scp@release
+      with:
+        local: ./artifact
+        remote: /tmp
+        host: ${{ secrets.ssh_host }}
+        username: ${{ secrets.ssh_user }}
+        password: ${{ secrets.ssh_pass }}
+        port: ${{ secrets.ssh_port }} 
+        
+    
