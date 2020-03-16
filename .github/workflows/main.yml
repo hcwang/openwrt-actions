@@ -20,11 +20,11 @@ jobs:
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get -qq update
-          sudo -E apt-get -qq install openssh-client build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
+          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
           sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
-          sudo -E service ssh restart
+          
     
     
     - name: Clone source code
@@ -35,6 +35,16 @@ jobs:
     - name: Add new feed from lienol
       run: cd openwrt && sed -i '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
     
+    
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.ssh_host }}
+        username: ${{ secrets.ssh_user }}
+        password: ${{ secrets.ssh_pass }}
+        port: ${{ secrets.ssh_port }}
+        source: "openwrt/feeds.conf.default"
+        target: "/tmp"
     - name: Copy single file to remote
       uses: garygrossgarten/github-action-scp@release
       with:
