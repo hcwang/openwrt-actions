@@ -100,6 +100,6 @@ jobs:
         username: ${{ secrets.ssh_user }}
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
-        script: sysupgrade -v /tmp/artifact/openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin
+        script: sysupgrade -v /tmp/artifact/openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin &
         
     
