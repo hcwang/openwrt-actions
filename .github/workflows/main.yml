@@ -77,9 +77,6 @@ jobs:
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
           
-    - name: list files of artifact
-      run : |
-          ls -l ./artifact/
 
           
     - name: Upload artifact
