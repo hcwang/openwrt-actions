@@ -71,12 +71,12 @@ jobs:
       run: |
           cd openwrt
           make -j1 V=s
-  　- name: Assemble artifact
+    - name: Assemble artifact
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
-  　- name: Create Release
+    - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
