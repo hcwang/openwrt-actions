@@ -37,11 +37,7 @@ jobs:
       run: cd openwrt && sed -i '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
     
     
-    - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@1.17.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.token }}
-        WITH_V: true
+    
     
       
     - name: Update feeds
@@ -81,15 +77,20 @@ jobs:
           rm -rf ./artifact/
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/sysupgrade.bin
-    
+    - name: Create Version Tag
+      id: create_version_tag
+      uses: anothrNick/github-tag-action@1.17.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+        WITH_V: true
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.token }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ steps.create_version_tag.outputs.new_tag }}
+        release_name: Release ${{ steps.create_version_tag.outputs.new_tag }}
         draft: false
         prerelease: false
     - name: Upload Release Asset
