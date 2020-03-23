@@ -12,6 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.17.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+        WITH_V: true
     - uses: actions/checkout@v1
     - name: Initialization environment
       env:
@@ -76,6 +81,7 @@ jobs:
           rm -rf ./artifact/
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/sysupgrade.bin
+    
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
