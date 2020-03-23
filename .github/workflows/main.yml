@@ -12,11 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@1.17.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.token }}
-        WITH_V: true
+    
     - uses: actions/checkout@v1
     - name: Initialization environment
       env:
@@ -41,7 +37,11 @@ jobs:
       run: cd openwrt && sed -i '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
     
     
-    
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@1.17.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+        WITH_V: true
     
       
     - name: Update feeds
