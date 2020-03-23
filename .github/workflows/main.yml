@@ -1,5 +1,4 @@
 name: xiaomi_r3p
-
 on:
   schedule:
     - cron: 0 20 * * *
@@ -77,9 +76,14 @@ jobs:
           rm -rf ./artifact/
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/sysupgrade.bin
+    - name: Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt firmware
+        path: ./artifact/
     - name: Create Version Tag
       id: create_version_tag
-      uses: 
+      uses: anothrNick/github-tag-action@1.17.2
       env:
         GITHUB_TOKEN: ${{ secrets.token }}
         WITH_V: true
@@ -109,11 +113,7 @@ jobs:
           
 
           
-    #- name: Upload artifact
-    #  uses: actions/upload-artifact@master
-    #  with:
-    #    name: OpenWrt firmware
-    #    path: ./artifact/
+    
     #- name: copy file via ssh password
     #  uses: appleboy/scp-action@master
     #  with:
