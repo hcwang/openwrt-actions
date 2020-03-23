@@ -75,7 +75,7 @@ jobs:
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/sysupgrade.bin
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -94,7 +94,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ./artifact/
-        asset_name: openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin
+        asset_name: sysupgrade.bin
         asset_content_type: application/zip
     
           
@@ -122,6 +122,10 @@ jobs:
         username: ${{ secrets.ssh_user }}
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
-        script: curl -o /temp/sysupgrade.zip {{steps.upload-release-asset.browser_download_url}} #sysupgrade -v /tmp/artifact/openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin &
+        script: |
+        curl -o /tmp/sysupgrade.zip {{steps.upload-release-asset.browser_download_url}} #sysupgrade -v /tmp/artifact/openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin &
+        unzip /tmp/sysupgrade.zip -d /tmp
+        sysupgrade -v /tmp sysupgrade.bin
+        
         
     
