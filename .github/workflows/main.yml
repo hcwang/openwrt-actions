@@ -32,12 +32,6 @@ jobs:
         REPO_URL: https://github.com/coolsnowwolf/lede.git
         REPO_BRANCH: master
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
-    - name: Add new feed from lienol
-      run: cd openwrt && sed -i '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
-    
-    
-    
-    
     - name: Create Version Tag
       id: create_version_tag
       uses: anothrNick/github-tag-action@1.18.0
@@ -48,7 +42,16 @@ jobs:
         SOURCE: ./openwrt
         DEFAULT_BUMP: patch
     - name: to be deleted
-      run: echo {{ steps.create_version_tag.outputs.tag }}
+      run: echo ${{ steps.create_version_tag.outputs.tag }}
+
+    
+    - name: Add new feed from lienol
+      run: cd openwrt && sed -i '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
+    
+    
+    
+    
+    
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
@@ -135,7 +138,7 @@ jobs:
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
         script: |
-          curl -o /tmp/sysupgrade.bin {{ steps.upload-release-asset.browser_download_url }} #sysupgrade -v /tmp/artifact/openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin &
+          curl -o /tmp/sysupgrade.bin ${{ steps.upload-release-asset.browser_download_url }} #sysupgrade -v /tmp/artifact/openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin &
           #unzip /tmp/sysupgrade.zip -d /tmp
           sysupgrade -v /tmp sysupgrade.bin &
         
