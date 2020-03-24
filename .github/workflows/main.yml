@@ -77,7 +77,7 @@ jobs:
           make -j1 V=s
     - name: Get current date
       id: currentdate
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d.%H.%M')"
     - name: Assemble artifact
       run: |
           rm -rf ./artifact/
@@ -141,7 +141,7 @@ jobs:
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
         script: |
-          curl -o /tmp/sysupgrade.bin ${{ steps.upload-release-asset.outputs.browser_download_url }}  -L | egrep -A 10 '301 Moved Permanently|302 Found' | grep 'Location' | awk -F': ' '{print $2}' | tail -1
+          curl -o /tmp/sysupgrade.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
           #unzip /tmp/sysupgrade.zip -d /tmp
           sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin &
         
