@@ -138,9 +138,9 @@ jobs:
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
         script: |
-          curl -o /tmp/sysupgrade.bin ${{ steps.upload-release-asset.browser_download_url }} #sysupgrade -v /tmp/artifact/openwrt-ramips-mt7621-xiaomi_mir3p-squashfs-sysupgrade.bin &
+          curl -o /tmp/sysupgrade.bin ${{ steps.upload-release-asset.outputs.browser_download_url }} 
           #unzip /tmp/sysupgrade.zip -d /tmp
-          sysupgrade -v /tmp sysupgrade.bin &
+          sysupgrade -v /tmp/sysupgrade.bin &
         
         
     
