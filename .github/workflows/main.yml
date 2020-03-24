@@ -88,32 +88,33 @@ jobs:
       with:
         name: OpenWrt firmware
         path: ./artifact/
-    - name: Create Version Tag
-      id: create_version_tag
-      uses: anothrNick/github-tag-action@1.18.0
-      # if: github.event == 'push' 
-      env:
-        GITHUB_TOKEN: ${{ secrets.token }}
-        WITH_V: true
-        DRY_RUN: true
-        DEFAULT_BUMP: patch
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.token }}
-      with:
-        tag_name: ${{ steps.create_version_tag.outputs.new_tag }}
-        release_name: Release ${{ steps.create_version_tag.outputs.tag }}
-        draft: false
-        prerelease: false
+    #- name: Create Version Tag
+    #  id: create_version_tag
+    #  uses: anothrNick/github-tag-action@1.18.0
+    #  # if: github.event == 'push' 
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.token }}
+    #    WITH_V: true
+    #    DRY_RUN: true
+    #    DEFAULT_BUMP: patch
+    #- name: Create Release
+    #  id: create_release
+    #  uses: actions/create-release@v1
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.token }}
+    #  with:
+    #    tag_name: ${{ steps.create_version_tag.outputs.new_tag }}
+    #    release_name: Release ${{ steps.create_version_tag.outputs.tag }}
+    #    draft: false
+    #    prerelease: false
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.token }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} #https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24793456/assets{?name,label} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        upload_url: https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24806714/assets{?name,label} 
+        #${{ steps.create_release.outputs.upload_url }} #https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24793456/assets{?name,label} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ./artifact/${{ steps.currentdate.outputs.date }}.bin
         asset_name: ${{ steps.currentdate.outputs.date }}.bin
         asset_content_type: application/zip
@@ -140,7 +141,7 @@ jobs:
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
         script: |
-          curl -o /tmp/sysupgrade.bin ${{ steps.upload-release-asset.outputs.browser_download_url }} 
+          curl -o /tmp/sysupgrade.bin ${{ steps.upload-release-asset.outputs.browser_download_url }}  -L | egrep -A 10 '301 Moved Permanently|302 Found' | grep 'Location' | awk -F': ' '{print $2}' | tail -1
           #unzip /tmp/sysupgrade.zip -d /tmp
           sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin &
         
