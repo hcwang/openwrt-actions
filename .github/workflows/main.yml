@@ -91,7 +91,7 @@ jobs:
     - name: Create Version Tag
       id: create_version_tag
       uses: anothrNick/github-tag-action@1.18.0
-      if: github.event == 'push' 
+      # if: github.event == 'push' 
       env:
         GITHUB_TOKEN: ${{ secrets.token }}
         WITH_V: true
