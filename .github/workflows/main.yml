@@ -103,7 +103,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.token }}
       with:
-        tag_name: ${{ steps.create_version_tag.outputs.tag }}
+        tag_name: ${{ steps.create_version_tag.outputs.new_tag }}
         release_name: Release ${{ steps.create_version_tag.outputs.tag }}
         draft: false
         prerelease: false
