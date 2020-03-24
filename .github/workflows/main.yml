@@ -11,7 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    
+    - name: Get current date
+      id: currentdate
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
     - uses: actions/checkout@v1
     - name: Initialization environment
       env:
@@ -32,17 +34,16 @@ jobs:
         REPO_URL: https://github.com/coolsnowwolf/lede.git
         REPO_BRANCH: master
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
-    - name: Create Version Tag
-      id: create_version_tag
-      uses: anothrNick/github-tag-action@1.18.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.token }}
-        WITH_V: true
-        DRY_RUN: true
-        SOURCE: ./openwrt
-        DEFAULT_BUMP: patch
-    - name: to be deleted
-      run: echo ${{ steps.create_version_tag.outputs.tag }}
+    #- name: Create Version Tag
+    #  id: create_version_tag
+    #  uses: anothrNick/github-tag-action@1.18.0
+    #  if: github.event == 'push' 
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.token }}
+    #    WITH_V: true
+    #    DRY_RUN: true
+    #    DEFAULT_BUMP: patch
+
 
     
     - name: Add new feed from lienol
@@ -88,32 +89,32 @@ jobs:
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/sysupgrade.bin
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
     - name: Upload artifact
       uses: actions/upload-artifact@master
       with:
         name: OpenWrt firmware
         path: ./artifact/
     
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.token }}
-      with:
-        tag_name: ${{ steps.create_version_tag.outputs.tag }}
-        release_name: Release ${{ steps.create_version_tag.outputs.tag }}
-        draft: true
-        prerelease: true
+    #- name: Create Release
+    #  id: create_release
+    #  uses: actions/create-release@v1
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.token }}
+    #  with:
+    #    tag_name: ${{ steps.create_version_tag.outputs.tag }}
+    #    release_name: Release ${{ steps.create_version_tag.outputs.tag }}
+    #    draft: true
+    #    prerelease: true
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.token }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./artifact/sysupgrade.bin
-        asset_name: sysupgrade.bin
+        upload_url: https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24793456/assets{?name,label} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./artifact/${{ steps.currentdate.outputs.date }}.bin
+        asset_name: ${{ steps.currentdate.outputs.date }}.bin
         asset_content_type: application/zip
     
           
@@ -140,7 +141,7 @@ jobs:
         script: |
           curl -o /tmp/sysupgrade.bin ${{ steps.upload-release-asset.outputs.browser_download_url }} 
           #unzip /tmp/sysupgrade.zip -d /tmp
-          sysupgrade -v /tmp/sysupgrade.bin &
+          sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin &
         
         
     
