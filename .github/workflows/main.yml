@@ -141,11 +141,8 @@ jobs:
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
         script: |
-          sleep 30
-          curl -4 --socks5 127.0.0.1:1080 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
-          sleep 5
-          #unzip /tmp/sysupgrade.zip -d /tmp
-          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin >/var/log/sysupgrade.log 2>&1 &
+          curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
+          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin >～/sysupgrade.log 2>&1 &
           exit
         
         
