@@ -141,7 +141,7 @@ jobs:
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
         script: |
-          curl --socks5 127.0.0.1:1080 -o /tmp/sysupgrade.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
+          curl --socks5 127.0.0.1:1080 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
           #unzip /tmp/sysupgrade.zip -d /tmp
           sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin &
         
