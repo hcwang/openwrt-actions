@@ -145,7 +145,8 @@ jobs:
           curl -4 --socks5 127.0.0.1:1080 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
           sleep 5
           #unzip /tmp/sysupgrade.zip -d /tmp
-          sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin &
+          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin >/var/log/sysupgrade.log 2>&1 &
+          exit
         
         
     
