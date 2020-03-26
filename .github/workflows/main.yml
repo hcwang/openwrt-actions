@@ -143,7 +143,8 @@ jobs:
         script: |
           curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
           sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin 
-          # > /tmp/sysupgrade.log 2>&1 
+          
+          
           
         
         
