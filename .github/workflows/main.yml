@@ -1,7 +1,7 @@
 name: xiaomi_r3p
 on:
   schedule:
-    - cron: 0 20 * * *
+    - cron: 0 19 * * *
   push:
     branches: 
       - master
@@ -142,7 +142,7 @@ jobs:
         port: ${{ secrets.ssh_port }}
         script: |
           curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
-          sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin 
+          sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin &
           
           
           
