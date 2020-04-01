@@ -39,7 +39,7 @@ jobs:
     - name: Add new feed from lienol
       run: |
         cd openwrt && sed -i '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
-        cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
+        cd package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
     
     
     
