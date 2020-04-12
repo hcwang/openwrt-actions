@@ -40,7 +40,7 @@ jobs:
       run: |
         cd openwrt && sed -i '$asrc-git lienol https://github.com/Lienol/openwrt-package' feeds.conf.default
         cd package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
-        cd ../kernel && rm -rf mt76 && git clone https://github.com/openwrt/mt76.git mt76
+        cd ../kernel/mt76 && rm -rf Makefile && cp ../../../../mt76.make Makefile
     
     
     
