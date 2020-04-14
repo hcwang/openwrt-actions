@@ -3986,7 +3986,7 @@ CONFIG_PACKAGE_luci-mod-admin-full=y
 #
 # 3. Applications
 #
-CONFIG_PACKAGE_luci-app-accesscontrol=y
+# CONFIG_PACKAGE_luci-app-accesscontrol is not set
 # CONFIG_PACKAGE_luci-app-acme is not set
 # CONFIG_PACKAGE_luci-app-adblock is not set
 CONFIG_PACKAGE_luci-app-adbyby-plus=y
@@ -4155,7 +4155,7 @@ CONFIG_PACKAGE_luci-app-wol=y
 #
 # 4. Themes
 #
-CONFIG_PACKAGE_luci-theme-argon=y
+# CONFIG_PACKAGE_luci-theme-argon is not set
 CONFIG_PACKAGE_luci-theme-argon-dark-mod=y
 # CONFIG_PACKAGE_luci-theme-argon-light-mod is not set
 CONFIG_PACKAGE_luci-theme-bootstrap=y
@@ -4203,7 +4203,6 @@ CONFIG_PACKAGE_luci-lib-nixio=y
 # CONFIG_PACKAGE_freifunk-watchdog is not set
 # CONFIG_PACKAGE_meshwizard is not set
 CONFIG_PACKAGE_default-settings=y
-CONFIG_PACKAGE_luci-i18n-accesscontrol-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-adbyby-plus-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-aria2-pt-br is not set
 # CONFIG_PACKAGE_luci-i18n-aria2-ru is not set
@@ -6048,3 +6047,6 @@ CONFIG_PACKAGE_ubi-utils=y
 # font-utils
 #
 # CONFIG_PACKAGE_fontconfig is not set
+
+
+
