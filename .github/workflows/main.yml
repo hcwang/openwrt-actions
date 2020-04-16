@@ -37,10 +37,10 @@ jobs:
 
     
     - name: Add new feed from lienol
-      run: cd openwrt && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
-        
-        # cd package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
-        # cd ../kernel/mt76 && rm -rf Makefile && cp ../../../../mt76.make Makefile
+      run: |
+        cd openwrt && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+        cd package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
+        cd ../kernel/mt76 && rm -rf Makefile && cp ../../../../mt76.make Makefile
     
     
     
