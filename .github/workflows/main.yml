@@ -56,7 +56,7 @@ jobs:
       run: |
           cd openwrt
           rm -f .config
-          cp ../xiaomir3p .config
+          cp ../xiaomi_r3p .config
           
     - name: Make Defconfig
       run: |
