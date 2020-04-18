@@ -56,7 +56,7 @@ jobs:
       run: |
           cd openwrt
           rm -f .config
-          cp ../withoutipv6andmwan3 .config
+          cp ../xiaomir3p .config
           
     - name: Make Defconfig
       run: |
@@ -85,7 +85,7 @@ jobs:
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
+          mv -f openwrt/bin/packages ./artifact/
     - name: Upload artifact
       uses: actions/upload-artifact@master
       with:
