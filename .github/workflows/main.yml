@@ -56,7 +56,7 @@ jobs:
       run: |
           cd openwrt
           rm -f .config
-          cp ../xiaomi_r3p .config
+          cp ../withoutipv6andmwan3 .config
           
     - name: Make Defconfig
       run: |
