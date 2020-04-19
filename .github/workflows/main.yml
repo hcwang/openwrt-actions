@@ -40,8 +40,8 @@ jobs:
       run: |
         cd openwrt && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
         cd package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
-        git clone https://github.com/pymumu/luci-app-smartdns -b lede
         cd ../kernel/mt76 && rm -rf Makefile && cp ../../../../mt76.make Makefile
+        cd ../../../feeds/luci && git clone https://github.com/pymumu/luci-app-smartdns -b lede
     
     
     
