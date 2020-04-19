@@ -442,6 +442,7 @@ CONFIG_FEED_routing=y
 CONFIG_FEED_telephony=y
 # CONFIG_FEED_helloworld is not set
 CONFIG_FEED_passwall=y
+CONFIG_FEED_openclass=y
 
 #
 # Base system
@@ -4084,7 +4085,7 @@ CONFIG_PACKAGE_luci-app-kodexplorer=y
 # CONFIG_PACKAGE_luci-app-mjpg-streamer is not set
 # CONFIG_PACKAGE_luci-app-mtwifi is not set
 CONFIG_PACKAGE_luci-app-mwan3=y
-# CONFIG_PACKAGE_luci-app-mwan3helper is not set
+CONFIG_PACKAGE_luci-app-mwan3helper=y
 # CONFIG_PACKAGE_luci-app-n2n_v2 is not set
 # CONFIG_PACKAGE_luci-app-netdata is not set
 CONFIG_PACKAGE_luci-app-nfs=y
@@ -4097,8 +4098,9 @@ CONFIG_PACKAGE_luci-app-nfs=y
 # CONFIG_PACKAGE_luci-app-olsr is not set
 # CONFIG_PACKAGE_luci-app-olsr-services is not set
 # CONFIG_PACKAGE_luci-app-olsr-viz is not set
+CONFIG_PACKAGE_luci-app-openclash=y
 # CONFIG_PACKAGE_luci-app-openvpn is not set
-CONFIG_PACKAGE_luci-app-openvpn-server=y
+# CONFIG_PACKAGE_luci-app-openvpn-server is not set
 # CONFIG_PACKAGE_luci-app-p910nd is not set
 # CONFIG_PACKAGE_luci-app-pagekitec is not set
 CONFIG_PACKAGE_luci-app-passwall=y
@@ -4329,8 +4331,8 @@ CONFIG_PACKAGE_luci-i18n-kodexplorer-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-mwan3-ru is not set
 CONFIG_PACKAGE_luci-i18n-mwan3-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-mwan3-zh-tw is not set
+CONFIG_PACKAGE_luci-i18n-mwan3helper-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-nfs-zh-cn=y
-CONFIG_PACKAGE_luci-i18n-openvpn-server-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-ramfree-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-samba-ca is not set
 # CONFIG_PACKAGE_luci-i18n-samba-cs is not set
@@ -5006,7 +5008,8 @@ CONFIG_PACKAGE_mwan3=y
 # CONFIG_PACKAGE_chaosvpn is not set
 # CONFIG_PACKAGE_fastd is not set
 # CONFIG_PACKAGE_ipsec-tools is not set
-# CONFIG_PACKAGE_n2n_v2 is not set
+# CONFIG_PACKAGE_n2n-edge is not set
+# CONFIG_PACKAGE_n2n-supernode is not set
 # CONFIG_PACKAGE_ocserv is not set
 # CONFIG_PACKAGE_openconnect is not set
 # CONFIG_PACKAGE_opennhrp is not set
@@ -5496,6 +5499,7 @@ CONFIG_PACKAGE_simple-obfs=y
 # Simple-obfs Compile Configuration
 #
 # CONFIG_SIMPLE_OBFS_STATIC_LINK is not set
+# CONFIG_PACKAGE_smartdns is not set
 # CONFIG_PACKAGE_smartsnmpd is not set
 # CONFIG_PACKAGE_snmp-mibs is not set
 # CONFIG_PACKAGE_snmp-utils is not set
