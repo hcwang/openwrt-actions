@@ -85,6 +85,7 @@ jobs:
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
           mv -f openwrt/bin/packages ./artifact/
     - name: Upload artifact
       uses: actions/upload-artifact@master
@@ -121,7 +122,7 @@ jobs:
         asset_path: ./artifact/${{ steps.currentdate.outputs.date }}.bin
         asset_name: ${{ steps.currentdate.outputs.date }}.bin
         asset_content_type: application/zip
-    
+        
           
 
           
