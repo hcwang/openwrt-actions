@@ -122,10 +122,6 @@ jobs:
         asset_path: ./artifact/${{ steps.currentdate.outputs.date }}.bin
         asset_name: ${{ steps.currentdate.outputs.date }}.bin
         asset_content_type: application/zip
-        
-          
-
-          
     
     #- name: copy file via ssh password
     #  uses: appleboy/scp-action@master
