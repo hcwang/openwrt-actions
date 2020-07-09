@@ -1927,20 +1927,20 @@ CONFIG_PACKAGE_kmod-fs-exfat0=y
 CONFIG_PACKAGE_kmod-fs-ext4=y
 # CONFIG_PACKAGE_kmod-fs-f2fs is not set
 # CONFIG_PACKAGE_kmod-fs-fscache is not set
-# CONFIG_PACKAGE_kmod-fs-hfs is not set
-# CONFIG_PACKAGE_kmod-fs-hfsplus is not set
+CONFIG_PACKAGE_kmod-fs-hfs=y
+CONFIG_PACKAGE_kmod-fs-hfsplus=y
 # CONFIG_PACKAGE_kmod-fs-isofs is not set
 # CONFIG_PACKAGE_kmod-fs-jfs is not set
 # CONFIG_PACKAGE_kmod-fs-ksmbd is not set
 # CONFIG_PACKAGE_kmod-fs-minix is not set
 # CONFIG_PACKAGE_kmod-fs-msdos is not set
-# CONFIG_PACKAGE_kmod-fs-nfs is not set
+CONFIG_PACKAGE_kmod-fs-nfs=y
 # CONFIG_PACKAGE_kmod-fs-nfs-common is not set
 # CONFIG_PACKAGE_kmod-fs-nfs-common-rpcsec is not set
 # CONFIG_PACKAGE_kmod-fs-nfs-v3 is not set
 # CONFIG_PACKAGE_kmod-fs-nfs-v4 is not set
 # CONFIG_PACKAGE_kmod-fs-nfsd is not set
-# CONFIG_PACKAGE_kmod-fs-ntfs is not set
+CONFIG_PACKAGE_kmod-fs-ntfs=y
 # CONFIG_PACKAGE_kmod-fs-reiserfs is not set
 # CONFIG_PACKAGE_kmod-fs-squashfs is not set
 # CONFIG_PACKAGE_kmod-fs-udf is not set
