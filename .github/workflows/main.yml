@@ -131,17 +131,17 @@ jobs:
     #    port: ${{ secrets.ssh_port }}
     #    source: "./artifact"
     #    target: "/tmp"
-    - name: executing remote ssh commands using ssh key
-      uses: appleboy/ssh-action@master
-      
-      with:
-        host: ${{ secrets.ssh_host }}
-        username: ${{ secrets.ssh_user }}
-        password: ${{ secrets.ssh_pass }}
-        port: ${{ secrets.ssh_port }}
-        script: |
-          curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
-          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin  &>/dev/null & exit
+    #- name: executing remote ssh commands using ssh key
+    #  uses: appleboy/ssh-action@master
+    #  
+    #  with:
+    #    host: ${{ secrets.ssh_host }}
+    #    username: ${{ secrets.ssh_user }}
+    #    password: ${{ secrets.ssh_pass }}
+    #    port: ${{ secrets.ssh_port }}
+    #    script: |
+    #      curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
+    #      nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin  &>/dev/null & exit
           
           
           
