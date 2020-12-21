@@ -31,7 +31,7 @@ jobs:
       env: 
         REPO_URL: https://github.com/coolsnowwolf/lede.git
         REPO_BRANCH: master
-      run: git clone https://github.com/coolsnowwolf/lede.git openwrt #git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt #git clone https://github.com/coolsnowwolf/lede.git openwrt #
     
 
 
@@ -39,6 +39,7 @@ jobs:
     - name: Add new feed from lienol
       run: |
           cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
+          cd openwrt && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
         
     
     
@@ -122,15 +123,15 @@ jobs:
         asset_name: ${{ steps.currentdate.outputs.date }}.bin
         asset_content_type: application/zip
     
-    #- name: copy file via ssh password
-    #  uses: appleboy/scp-action@master
-    #  with:
-    #    host: ${{ secrets.ssh_host }}
-    #    username: ${{ secrets.ssh_user }}
-    #    password: ${{ secrets.ssh_pass }}
-    #    port: ${{ secrets.ssh_port }}
-    #    source: "./artifact"
-    #    target: "/tmp"
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.ssh_host }}
+        username: ${{ secrets.ssh_user }}
+        password: ${{ secrets.ssh_pass }}
+        port: ${{ secrets.ssh_port }}
+        source: "./artifact"
+        target: "/tmp"
     #- name: executing remote ssh commands using ssh key
     #  uses: appleboy/ssh-action@master
     #  
