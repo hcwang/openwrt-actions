@@ -142,7 +142,7 @@ jobs:
         port: ${{ secrets.ssh_port }}
         script: |
           curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
-          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin  &>/dev/null &
+          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
           
           
           
