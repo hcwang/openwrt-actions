@@ -5074,7 +5074,7 @@ CONFIG_PACKAGE_libpcre2=y
 CONFIG_PACKAGE_libpng=y
 CONFIG_PACKAGE_libpopt=m
 # CONFIG_PACKAGE_libpri is not set
-# CONFIG_PACKAGE_libprotobuf-c is not set
+CONFIG_PACKAGE_libprotobuf-c=y
 # CONFIG_PACKAGE_libpsl is not set
 # CONFIG_PACKAGE_libqmi is not set
 # CONFIG_PACKAGE_libqrencode is not set
@@ -5376,12 +5376,12 @@ CONFIG_PACKAGE_luci-app-nlbwmon=y
 # CONFIG_PACKAGE_luci-app-noddos is not set
 # CONFIG_PACKAGE_luci-app-nps is not set
 # CONFIG_PACKAGE_luci-app-ntpc is not set
-# CONFIG_PACKAGE_luci-app-ocserv is not set
+CONFIG_PACKAGE_luci-app-ocserv=y
 # CONFIG_PACKAGE_luci-app-olsr is not set
 # CONFIG_PACKAGE_luci-app-olsr-services is not set
 # CONFIG_PACKAGE_luci-app-olsr-viz is not set
 # CONFIG_PACKAGE_luci-app-openvpn is not set
-# CONFIG_PACKAGE_luci-app-openvpn-server is not set
+CONFIG_PACKAGE_luci-app-openvpn-server=y
 # CONFIG_PACKAGE_luci-app-p910nd is not set
 # CONFIG_PACKAGE_luci-app-pagekitec is not set
 # CONFIG_PACKAGE_luci-app-polipo is not set
@@ -5622,6 +5622,7 @@ CONFIG_PACKAGE_luci-i18n-meshwizard-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-nlbwmon-ja is not set
 # CONFIG_PACKAGE_luci-i18n-nlbwmon-ru is not set
 CONFIG_PACKAGE_luci-i18n-nlbwmon-zh-cn=y
+CONFIG_PACKAGE_luci-i18n-openvpn-server-zh-cn=y
 CONFIG_PACKAGE_luci-i18n-ramfree-zh-cn=y
 # CONFIG_PACKAGE_luci-i18n-samba-ca is not set
 # CONFIG_PACKAGE_luci-i18n-samba-cs is not set
@@ -6208,17 +6209,7 @@ CONFIG_OPENLDAP_DEBUG=y
 #
 # Project V
 #
-CONFIG_PACKAGE_v2ray=y
-
-#
-# V2Ray Configuration
-#
-CONFIG_V2RAY_COMPRESS_GOPROXY=y
-CONFIG_V2RAY_EXCLUDE_V2CTL=y
-CONFIG_V2RAY_EXCLUDE_ASSETS=y
-CONFIG_V2RAY_COMPRESS_UPX=y
-# end of V2Ray Configuration
-
+# CONFIG_PACKAGE_v2ray is not set
 CONFIG_PACKAGE_v2ray-plugin=y
 CONFIG_v2ray-plugin_INCLUDE_GOPROXY=y
 # end of Project V
@@ -6405,12 +6396,34 @@ CONFIG_PACKAGE_ip-full=y
 # CONFIG_PACKAGE_libreswan is not set
 # CONFIG_PACKAGE_n2n-edge is not set
 # CONFIG_PACKAGE_n2n-supernode is not set
-# CONFIG_PACKAGE_ocserv is not set
+CONFIG_PACKAGE_ocserv=y
+
+#
+# Configuration
+#
+# CONFIG_OCSERV_PAM is not set
+# CONFIG_OCSERV_SECCOMP is not set
+# CONFIG_OCSERV_RADIUS is not set
+CONFIG_OCSERV_PROTOBUF=y
+CONFIG_OCSERV_HTTP_PARSER=y
+# end of Configuration
+
 # CONFIG_PACKAGE_openconnect is not set
 # CONFIG_PACKAGE_openfortivpn is not set
-# CONFIG_PACKAGE_openvpn-easy-rsa is not set
+CONFIG_PACKAGE_openvpn-easy-rsa=y
 # CONFIG_PACKAGE_openvpn-mbedtls is not set
-# CONFIG_PACKAGE_openvpn-openssl is not set
+CONFIG_PACKAGE_openvpn-openssl=y
+# CONFIG_OPENVPN_openssl_ENABLE_LZO is not set
+CONFIG_OPENVPN_openssl_ENABLE_LZ4=y
+# CONFIG_OPENVPN_openssl_ENABLE_X509_ALT_USERNAME is not set
+# CONFIG_OPENVPN_openssl_ENABLE_MANAGEMENT is not set
+CONFIG_OPENVPN_openssl_ENABLE_FRAGMENT=y
+CONFIG_OPENVPN_openssl_ENABLE_MULTIHOME=y
+CONFIG_OPENVPN_openssl_ENABLE_PORT_SHARE=y
+CONFIG_OPENVPN_openssl_ENABLE_DEF_AUTH=y
+CONFIG_OPENVPN_openssl_ENABLE_PF=y
+# CONFIG_OPENVPN_openssl_ENABLE_IPROUTE2 is not set
+CONFIG_OPENVPN_openssl_ENABLE_SMALL=y
 # CONFIG_PACKAGE_pptpd is not set
 # CONFIG_PACKAGE_softethervpn-base is not set
 # CONFIG_PACKAGE_softethervpn-bridge is not set
@@ -6467,6 +6480,7 @@ CONFIG_PACKAGE_softethervpn5-server=y
 # CONFIG_PACKAGE_frps is not set
 # CONFIG_PACKAGE_haproxy is not set
 # CONFIG_PACKAGE_haproxy-nossl is not set
+CONFIG_PACKAGE_ipt2socks=y
 # CONFIG_PACKAGE_kcptun-client is not set
 # CONFIG_PACKAGE_kcptun-config is not set
 # CONFIG_PACKAGE_kcptun-server is not set
@@ -6710,8 +6724,6 @@ CONFIG_PACKAGE_etherwake=y
 # CONFIG_PACKAGE_ipip is not set
 CONFIG_PACKAGE_ipset=y
 # CONFIG_PACKAGE_ipset-dns is not set
-CONFIG_PACKAGE_ipt2socks=y
-CONFIG_PACKAGE_ipt2socks-alt=y
 # CONFIG_PACKAGE_iptraf-ng is not set
 # CONFIG_PACKAGE_iputils-arping is not set
 # CONFIG_PACKAGE_iputils-clockdiff is not set
@@ -6898,6 +6910,17 @@ CONFIG_PACKAGE_wol=y
 # CONFIG_PACKAGE_wpan-tools is not set
 # CONFIG_PACKAGE_wwan is not set
 # CONFIG_PACKAGE_xinetd is not set
+CONFIG_PACKAGE_xray-core=y
+
+#
+# Xray-core Configuration
+#
+CONFIG_XRAY_CORE_PROVIDE_V2RAY_CORE=y
+# CONFIG_XRAY_CORE_COMPRESS_GOPROXY is not set
+CONFIG_XRAY_CORE_COMPRESS_UPX=y
+# end of Xray-core Configuration
+
+# CONFIG_PACKAGE_xray-geodata is not set
 # end of Network
 
 #
@@ -7036,7 +7059,7 @@ CONFIG_PACKAGE_unzip=y
 # Encryption
 #
 # CONFIG_PACKAGE_ccrypt is not set
-# CONFIG_PACKAGE_certtool is not set
+CONFIG_PACKAGE_certtool=y
 # CONFIG_PACKAGE_cryptsetup is not set
 # CONFIG_PACKAGE_gnupg is not set
 # CONFIG_PACKAGE_gnutls-utils is not set
