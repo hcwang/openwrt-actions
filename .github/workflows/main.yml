@@ -54,7 +54,7 @@ jobs:
       run: cd openwrt && ./scripts/feeds install -a
     
     - name: Update homebridge
-      run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../node-homebridge .
+      run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ~/node-homebridge .
 
 
     - name: Costom configure file
