@@ -40,14 +40,17 @@ jobs:
       run: |
           cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
           cd ../.. && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
-        
-    
+          
+          
     
     
     
     
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
+    
+    - name: Update homebridge
+      run: cd openwrt && rm -fr package/feeds/packages/node-homebridge && cp -r ../node-homebridge package/feeds/packages/
 
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
