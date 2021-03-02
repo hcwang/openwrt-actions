@@ -2593,7 +2593,8 @@ CONFIG_ZABBIX_POSTGRESQL=y
 # CONFIG_SCHROOT_UUID is not set
 # end of Configuration
 
-# CONFIG_PACKAGE_sudo is not set
+CONFIG_PACKAGE_sudo=y
+
 # CONFIG_PACKAGE_syslog-ng is not set
 # end of Administration
 
@@ -3767,6 +3768,8 @@ CONFIG_NODEJS_ICU_NONE=y
 # CONFIG_PACKAGE_node-cylon-i2c is not set
 # CONFIG_PACKAGE_node-hid is not set
 CONFIG_PACKAGE_node-homebridge=y
+CONFIG_PACKAGE_node-homebridge-config-ui-x=y 
+CONFIG_PACKAGE_node-pty-prebuilt-multiarch=y
 # CONFIG_PACKAGE_node-javascript-obfuscator is not set
 CONFIG_PACKAGE_node-npm=y
 # CONFIG_PACKAGE_node-serialport is not set

@@ -4,37 +4,36 @@
 
 include $(TOPDIR)/rules.mk
 
-PKG_NPM_NAME:=homebridge
-PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=1.3.1
+PKG_NPM_NAME:=node-pty-prebuilt-multiarch
+PKG_NAME:=$(PKG_NPM_NAME)
+PKG_VERSION:=0.10.1-pre.3
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://registry.npmjs.org/$(PKG_NPM_NAME)/-/
-PKG_HASH:=f0fa55ecccfb77676bcd08d4610de578c477792e261d3320ded2d21dc132f83d
-
-PKG_BUILD_DEPENDS:=node/host
-PKG_USE_MIPS16:=0
+PKG_HASH:=a7e19e474941a74a9297b2d07d8096e09df7391fe8192c2a54b70575058f8782
 
 PKG_MAINTAINER:=Hirokazu MORIKAWA <morikw2@gmail.com>
-PKG_LICENSE:=ISC Apache-2.0
+PKG_LICENSE:=MIT
 PKG_LICENSE_FILES:=LICENSE
+
+PKG_BUILD_DEPENDS:=node/host
+PKG_BUILD_PARALLEL:=1
+PKG_USE_MIPS16:=0
 
 include $(INCLUDE_DIR)/package.mk
 
-define Package/node-homebridge
+define Package/node-pty-prebuilt-multiarch
   SUBMENU:=Node.js
   SECTION:=lang
   CATEGORY:=Languages
-  TITLE:=Node.js HomeKit Server
-  URL:=https://www.npmjs.org/package/homebridge
-  DEPENDS:=+node +node-npm
-  USERID:=homebridge:homebridge
+  TITLE:=Fork pseudoterminals in Node.JS
+  URL:=https://www.npmjs.com/package/node-pty-prebuilt-multiarch
+  DEPENDS:=+node
 endef
 
-define Package/node-homebridge/description
- Homebridge is a lightweight Node.js server you can run on your home network that emulates the iOS HomeKit API
- *** You need to install avahi-nodbus-daemon or avahi-dbus-daemon or umdns or mdnsd package. ***
+define Package/node-pty-prebuilt-multiarch/description
+ This project is a parallel fork of node-pty providing prebuilt packages for certain Node.js and Electron versions.
 endef
 
 TAR_OPTIONS+= --strip-components 1
@@ -47,6 +46,7 @@ TARGET_CFLAGS+=$(FPIC)
 TARGET_CPPFLAGS+=$(FPIC)
 
 define Build/Compile
+	rm -rf $(PKG_BUILD_DIR)/prebuilds
 	$(MAKE_VARS) \
 	$(MAKE_FLAGS) \
 	npm_config_arch=$(NODEJS_CPU) \
@@ -61,26 +61,23 @@ define Build/Compile
 	rm -rf $(TMP_DIR)/npm-cache-$(TMPNPM)
 endef
 
-define Package/node-homebridge/install
+define Package/node-pty-prebuilt-multiarch/install
 	$(INSTALL_DIR) $(1)/usr/lib/node/$(PKG_NPM_NAME)
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_NPM_NAME)/{*.json,*.md} \
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_NPM_NAME)/{package.json,LICENSE,*.md} \
 		$(1)/usr/lib/node/$(PKG_NPM_NAME)/
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_NPM_NAME)/{node_modules,lib} \
 		$(1)/usr/lib/node/$(PKG_NPM_NAME)/
-	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_NPM_NAME)/{LICENSE,bin} \
-		$(1)/usr/lib/node/$(PKG_NPM_NAME)/
-	$(INSTALL_DIR) $(1)/usr/bin
-	$(LN) ../lib/node/$(PKG_NPM_NAME)/bin/homebridge $(1)/usr/bin/homebridge
-	$(INSTALL_DIR) $(1)/etc/init.d
-	$(INSTALL_BIN) ./files/homebridge.init $(1)/etc/init.d/homebridge
+	$(INSTALL_DIR) $(1)/usr/lib/node/$(PKG_NPM_NAME)/build/Release
+	$(CP) $(PKG_INSTALL_DIR)/usr/lib/node_modules/$(PKG_NPM_NAME)/build/Release/pty.node \
+		$(1)/usr/lib/node/$(PKG_NPM_NAME)/build/Release/
 	$(INSTALL_DIR) $(1)/usr/lib/node_modules
 	$(LN) ../node/$(PKG_NPM_NAME) $(1)/usr/lib/node_modules/$(PKG_NPM_NAME)
 endef
 
-define Package/node-homebridge/postrm
+define Package/node-pty-prebuilt-multiarch/postrm
 #!/bin/sh
-rm /usr/lib/node_modules/homebridge || true
-rm -rf /usr/lib/node/homebridge || true
+rm /usr/lib/node_modules/node-pty-prebuilt-multiarch || true
+rm -rf /usr/lib/node/node-pty-prebuilt-multiarch || true
 endef
 
-$(eval $(call BuildPackage,node-homebridge))
+$(eval $(call BuildPackage,node-pty-prebuilt-multiarch))
