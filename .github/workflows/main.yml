@@ -49,12 +49,14 @@ jobs:
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
     
-    - name: Update homebridge
-      run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../node-homebridge .
-
+    
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
     
+    - name: Update homebridge
+      run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../node-homebridge .
+
+
     - name: Costom configure file
       run: |
           cd openwrt
