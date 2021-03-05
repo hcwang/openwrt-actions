@@ -1,0 +1,156 @@
+name: raspberry_pi_4
+on:
+  schedule:
+    - cron: 0 18 * * 5
+  #push:
+  #  branches: 
+  #    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - uses: actions/checkout@v1
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx g++-multilib libelf-dev autoconf automake libtool autopoint device-tree-compiler
+          sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
+          
+    
+    
+    - name: Clone source code
+      env: 
+        REPO_URL: https://github.com/coolsnowwolf/lede.git
+        REPO_BRANCH: master
+      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt #git clone https://github.com/coolsnowwolf/lede.git openwrt #
+    
+
+
+    
+    - name: Add new feed from lienol
+      run: |
+          cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  
+          cd ../.. && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+          
+          
+    
+    
+    
+    
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+    
+    
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
+    
+    - name: Update homebridge
+      run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../../../../node-homebridge . && cp -r ../../../../node-homebridge-config-ui-x . && cp -r ../../../../node-pty-prebuilt-multiarch .
+
+
+    - name: Custom configure file
+      run: |
+          cd openwrt
+          rm -f .config
+          cp ../raspberry_pi_4 .config
+          
+    - name: Make Defconfig
+      run: |
+          cd openwrt
+          make defconfig
+    - name: Make download
+      run: |
+          cd openwrt
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+    - name: Multi-thread compile
+      run: |
+          cd openwrt
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+    - name: Single-thread compile
+      if: failure()
+      run: |
+          cd openwrt
+          make -j1 V=s
+    - name: Get current date
+      id: currentdate
+      run: echo "::set-output name=date::$(date +'%Y-%m-%d.%H.%M')"
+    - name: Assemble artifact
+      run: |
+          rm -rf ./artifact/
+          mkdir -p ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
+          mv -f openwrt/bin/packages ./artifact/
+    - name: Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: OpenWrt firmware
+        path: ./artifact/
+    #- name: Create Version Tag
+    #  id: create_version_tag
+    #  uses: anothrNick/github-tag-action@1.18.0
+    #  # if: github.event == 'push' 
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.token }}
+    #    WITH_V: true
+    #    DRY_RUN: true
+    #    DEFAULT_BUMP: patch
+    #- name: Create Release
+    #  id: create_release
+    #  uses: actions/create-release@v1
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.token }}
+    #  with:
+    #    tag_name: ${{ steps.create_version_tag.outputs.new_tag }}
+    #    release_name: Release ${{ steps.create_version_tag.outputs.tag }}
+    #    draft: false
+    #    prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+      with:
+        upload_url: https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24806714/assets{?name,label} 
+        #${{ steps.create_release.outputs.upload_url }} #https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24793456/assets{?name,label} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./artifact/${{ steps.currentdate.outputs.date }}.bin
+        asset_name: ${{ steps.currentdate.outputs.date }}.bin
+        asset_content_type: application/zip
+    
+    #- name: copy file via ssh password
+    #  uses: appleboy/scp-action@master
+    #  with:
+    #    host: ${{ secrets.ssh_host }}
+    #    username: ${{ secrets.ssh_user }}
+    #    password: ${{ secrets.ssh_pass }}
+    #    port: ${{ secrets.ssh_port }}
+    #    source: "./artifact"
+    #    target: "/tmp"
+    #- name: executing remote ssh commands using ssh key
+    #  uses: appleboy/ssh-action@master
+    #  
+    #  with:
+    #    host: ${{ secrets.ssh_host }}
+    #    username: ${{ secrets.ssh_user }}
+    #    password: ${{ secrets.ssh_pass }}
+    #    port: ${{ secrets.ssh_port }}
+    #    script: |
+    #      curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
+    #      nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
+          
+          
+          
+        
+        
+    

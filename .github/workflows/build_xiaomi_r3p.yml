@@ -2,9 +2,9 @@ name: xiaomi_r3p
 on:
   schedule:
     - cron: 0 16 * * 5
-  push:
-    branches: 
-      - master
+  #push:
+  #  branches: 
+  #    - master
 
 jobs:
   build:
@@ -57,7 +57,7 @@ jobs:
       run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../../../../node-homebridge . && cp -r ../../../../node-homebridge-config-ui-x . && cp -r ../../../../node-pty-prebuilt-multiarch .
 
 
-    - name: Costom configure file
+    - name: Custom configure file
       run: |
           cd openwrt
           rm -f .config
