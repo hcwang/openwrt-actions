@@ -65,9 +65,9 @@ jobs:
           git pull --depth 1 origin master
           cd $root_path/openwrt/package/feeds/packages
           rm -fr node-homebridge
-          cp -r $root_path/node-homebridge . 
-          cp -r $root_path/node-homebridge-config-ui-x . 
-          cp -r $root_path/node-pty-prebuilt-multiarch .
+          cp -r $root_path/homebridge/node-homebridge . 
+          cp -r $root_path/homebridge/node-homebridge-config-ui-x . 
+          cp -r $root_path/homebridge/node-pty-prebuilt-multiarch .
 
 
     - name: Custom configure file
