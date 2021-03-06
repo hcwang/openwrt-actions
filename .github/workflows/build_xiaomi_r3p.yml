@@ -55,7 +55,7 @@ jobs:
     
     #- name: Update homebridge
     #  run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../../../../node-homebridge . && cp -r ../../../../node-homebridge-config-ui-x . && cp -r ../../../../node-pty-prebuilt-multiarch .
-   - name: Update homebridge
+    - name: Update homebridge
       run: |
           export root_path=$(pwd) 
           mkdir homebridge
