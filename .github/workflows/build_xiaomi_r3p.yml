@@ -60,13 +60,11 @@ jobs:
           export root_path=$(pwd) 
           mkdir homebridge
           cd homebridge
-          
-          cd openwrt/package/feeds/packages && rm -fr node-homebridge
           git init
           git remote add origin https://github.com/nxhack/openwrt-node-packages.git
           git config core.sparsecheckout true
           echo -e "node-homebridge\nnode-homebridge-config-ui-x\nnode-homebridge-camera-ffmpeg\node-homebridge-cmd4\nnode-pty-prebuilt-multiarch">>.git/info/sparse-checkout
-          git pull origin master
+          git pull --depth 1 origin master
           cd $root_path/openwrt/package/feeds/packages
           rm -fr node-homebridge
           cp -r $root_path/node-homebridge . 
