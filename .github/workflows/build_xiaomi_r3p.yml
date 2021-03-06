@@ -2,9 +2,9 @@ name: xiaomi_r3p
 on:
   schedule:
     - cron: 0 16 * * 5
-  #push:
-  #  branches: 
-  #    - master
+  push:
+    branches: 
+      - master
 
 jobs:
   build:
@@ -53,8 +53,25 @@ jobs:
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
     
-    - name: Update homebridge
-      run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../../../../node-homebridge . && cp -r ../../../../node-homebridge-config-ui-x . && cp -r ../../../../node-pty-prebuilt-multiarch .
+    #- name: Update homebridge
+    #  run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../../../../node-homebridge . && cp -r ../../../../node-homebridge-config-ui-x . && cp -r ../../../../node-pty-prebuilt-multiarch .
+   - name: Update homebridge
+      run: |
+          export root_path=$(pwd) 
+          mkdir homebridge
+          cd homebridge
+          
+          cd openwrt/package/feeds/packages && rm -fr node-homebridge
+          git init
+          git remote add origin https://github.com/nxhack/openwrt-node-packages.git
+          git config core.sparsecheckout true
+          echo -e "node-homebridge\nnode-homebridge-config-ui-x\nnode-homebridge-camera-ffmpeg\node-homebridge-cmd4\nnode-pty-prebuilt-multiarch">>.git/info/sparse-checkout
+          git pull origin master
+          cd $root_path/openwrt/package/feeds/packages
+          rm -fr node-homebridge
+          cp -r $root_path/node-homebridge . 
+          cp -r $root_path/node-homebridge-config-ui-x . 
+          cp -r $root_path/node-pty-prebuilt-multiarch .
 
 
     - name: Custom configure file
