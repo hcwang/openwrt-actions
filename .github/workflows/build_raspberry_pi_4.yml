@@ -54,7 +54,22 @@ jobs:
       run: cd openwrt && ./scripts/feeds install -a
     
     - name: Update homebridge
-      run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../../../../node-homebridge . && cp -r ../../../../node-homebridge-config-ui-x . && cp -r ../../../../node-pty-prebuilt-multiarch .
+      run: |
+          export root_path=$(pwd) 
+          mkdir homebridge
+          cd homebridge
+          
+          cd openwrt/package/feeds/packages && rm -fr node-homebridge
+          git init
+          git remote add origin https://github.com/nxhack/openwrt-node-packages.git
+          git config core.sparsecheckout true
+          echo -e "node-homebridge\nnode-homebridge-config-ui-x\nnode-homebridge-camera-ffmpeg\node-homebridge-cmd4\nnode-pty-prebuilt-multiarch">>.git/info/sparse-checkout
+          git pull origin master
+          cd $root_path/openwrt/package/feeds/packages
+          rm -fr node-homebridge
+          cp -r $root_path/node-homebridge . 
+          cp -r $root_path/node-homebridge-config-ui-x . 
+          cp -r $root_path/node-pty-prebuilt-multiarch .
 
 
     - name: Custom configure file
@@ -116,17 +131,28 @@ jobs:
     #    release_name: Release ${{ steps.create_version_tag.outputs.tag }}
     #    draft: false
     #    prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset 
+    - name: Create Release and upload assets
+      id: release-asset
       uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.token }}
       with:
-        upload_url: https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24806714/assets{?name,label} 
-        #${{ steps.create_release.outputs.upload_url }} #https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24793456/assets{?name,label} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./artifact/${{ steps.currentdate.outputs.date }}.bin
-        asset_name: ${{ steps.currentdate.outputs.date }}.bin
-        asset_content_type: application/zip
+          repo_token: "${{ secrets.token }}"
+          automatic_release_tag: "latest"
+          prerelease: True
+          title: XiaoMi_3Pro_${{ steps.currentdate.outputs.date }}
+          files: |
+            ./artifact/${{ steps.currentdate.outputs.date }}.bin
+            ./artifact/**/*.ipk
+    #- name: Upload Release Asset
+    #  id: upload-release-asset 
+    #  uses: actions/upload-release-asset@v1
+    #  env:
+    #    GITHUB_TOKEN: ${{ secrets.token }}
+    #  with:
+    #    upload_url: https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24806714/assets{?name,label} 
+    #    #${{ steps.create_release.outputs.upload_url }} #https://uploads.github.com/repos/hcwang/openwrt-xiaomir3p/releases/24793456/assets{?name,label} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+    #    asset_path: ./artifact/${{ steps.currentdate.outputs.date }}.bin
+    #    asset_name: ${{ steps.currentdate.outputs.date }}.bin
+    #    asset_content_type: application/zip
     
     #- name: copy file via ssh password
     #  uses: appleboy/scp-action@master
