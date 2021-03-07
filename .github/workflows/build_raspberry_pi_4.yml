@@ -132,8 +132,6 @@ jobs:
     - name: Create Release and upload assets
       id: release-asset
       uses: marvinpinto/action-automatic-releases@latest"
-      run: |
-          echo "done!"
       with:
           repo_token: "${{ secrets.token }}"
           automatic_release_tag: "latest"
