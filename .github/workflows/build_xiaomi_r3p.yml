@@ -17,6 +17,7 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
+          echo $(pwd)
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
           sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get -qq update
@@ -143,7 +144,9 @@ jobs:
     #    asset_content_type: application/zip
     - name: Create Release and upload assets
       id: release-asset
-      uses: actions/upload-release-asset@v1
+      uses: marvinpinto/action-automatic-releases@latest"
+      run: |
+          echo "done!"
       with:
           repo_token: "${{ secrets.token }}"
           automatic_release_tag: "latest"
