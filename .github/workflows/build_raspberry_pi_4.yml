@@ -104,6 +104,7 @@ jobs:
           rm -rf ./artifact/
           mkdir -p ./artifact/
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
+          find openwrt/bin/targets/ -name "*.tar.gz" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.tar.gz
           mv -f openwrt/bin/packages ./artifact/
     - name: Upload artifact
       uses: actions/upload-artifact@master
@@ -134,7 +135,7 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       with:
           repo_token: "${{ secrets.token }}"
-          automatic_release_tag: "latest"
+          automatic_release_tag: "RaspberryPi4_${{ steps.currentdate.outputs.date }}"
           prerelease: True
           title: RaspberryPi4_${{ steps.currentdate.outputs.date }}
           files: |
