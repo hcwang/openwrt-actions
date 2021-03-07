@@ -144,7 +144,7 @@ jobs:
     #    asset_content_type: application/zip
     - name: Create Release and upload assets
       id: release-asset
-      uses: marvinpinto/action-automatic-releases@latest"
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
           repo_token: "${{ secrets.token }}"
           automatic_release_tag: "latest"
