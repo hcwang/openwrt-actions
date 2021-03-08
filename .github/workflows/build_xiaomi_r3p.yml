@@ -147,7 +147,7 @@ jobs:
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
           repo_token: "${{ secrets.token }}"
-          automatic_release_tag: "RaspberryPi4_${{ steps.currentdate.outputs.date }}"
+          automatic_release_tag: "XiaoMiR3P_${{ steps.currentdate.outputs.date }}"
           prerelease: True
           title: XiaoMi_3Pro_${{ steps.currentdate.outputs.date }}
           files: |

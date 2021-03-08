@@ -106,6 +106,7 @@ jobs:
           find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
           find openwrt/bin/targets/ -name "*.tar.gz" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.tar.gz
           mv -f openwrt/bin/packages ./artifact/
+          mv -f openwrt/bin/targets ./artifact/
     - name: Upload artifact
       uses: actions/upload-artifact@master
       with:
