@@ -2,9 +2,9 @@ name: raspberry_pi_4
 on:
   schedule:
     - cron: 0 18 * * 5
-  push:
-    branches: 
-      - master
+  #push:
+  #  branches: 
+  #    - master
 
 jobs:
   build:
@@ -103,8 +103,8 @@ jobs:
       run: |
           rm -rf ./artifact/
           mkdir -p ./artifact/
-          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
-          find openwrt/bin/targets/ -name "*.tar.gz" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.tar.gz
+          
+          find openwrt/bin/targets/ -name "*.img.gz" | xargs -i mv -f {} ./artifact/
           mv -f openwrt/bin/packages ./artifact/
           mv -f openwrt/bin/targets ./artifact/
     - name: Upload artifact
@@ -140,7 +140,7 @@ jobs:
           prerelease: True
           title: RaspberryPi4_${{ steps.currentdate.outputs.date }}
           files: |
-            ./artifact/${{ steps.currentdate.outputs.date }}.bin
+            ./artifact/*.img.gz
             ./artifact/**/*.ipk
     #- name: Upload Release Asset
     #  id: upload-release-asset 

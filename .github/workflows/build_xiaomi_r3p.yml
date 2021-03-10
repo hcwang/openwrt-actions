@@ -153,15 +153,15 @@ jobs:
           files: |
             ./artifact/${{ steps.currentdate.outputs.date }}.bin
             ./artifact/**/*.ipk
-    #- name: copy file via ssh password
-    #  uses: appleboy/scp-action@master
-    #  with:
-    #    host: ${{ secrets.ssh_host }}
-    #    username: ${{ secrets.ssh_user }}
-    #    password: ${{ secrets.ssh_pass }}
-    #    port: ${{ secrets.ssh_port }}
-    #    source: "./artifact"
-    #    target: "/tmp"
+    - name: copy file via ssh password
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.ssh_host }}
+        username: ${{ secrets.ssh_user }}
+        password: ${{ secrets.ssh_pass }}
+        port: ${{ secrets.ssh_port }}
+        source: "./artifact"
+        target: "/tmp"
     - name: executing remote ssh commands using ssh key
       uses: appleboy/ssh-action@master
       
