@@ -153,15 +153,15 @@ jobs:
           files: |
             ./artifact/${{ steps.currentdate.outputs.date }}.bin
             ./artifact/**/*.ipk
-    - name: copy file via ssh password
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.ssh_host }}
-        username: ${{ secrets.ssh_user }}
-        password: ${{ secrets.ssh_pass }}
-        port: ${{ secrets.ssh_port }}
-        source: "./artifact"
-        target: "/tmp"
+    #- name: copy file via ssh password
+    #  uses: appleboy/scp-action@master
+    #  with:
+    #    host: ${{ secrets.ssh_host }}
+    #    username: ${{ secrets.ssh_user }}
+    #    password: ${{ secrets.ssh_pass }}
+    #    port: ${{ secrets.ssh_port }}
+    #    source: "./artifact"
+    #    target: "/tmp"
     - name: executing remote ssh commands using ssh key
       uses: appleboy/ssh-action@master
       
@@ -171,7 +171,7 @@ jobs:
         password: ${{ secrets.ssh_pass }}
         port: ${{ secrets.ssh_port }}
         script: |
-          curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L ${{ steps.upload-release-asset.outputs.browser_download_url }}
+          curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/${{ steps.release-asset.outputs.automatic_releases_tag }}/${{ steps.currentdate.outputs.date }}.bin
           nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
           
           
