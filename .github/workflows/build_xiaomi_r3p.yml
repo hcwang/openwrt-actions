@@ -172,6 +172,7 @@ jobs:
         port: ${{ secrets.ssh_port }}
         script: |
           curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/${{ steps.release-asset.outputs.automatic_releases_tag }}/${{ steps.currentdate.outputs.date }}.bin
+          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
           
           
           
