@@ -18,7 +18,9 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
           echo $(pwd)
-          
+          sudo gem install apt-spy2
+          sudo apt-spy2 check
+          sudo apt-spy2 fix --commit
           sudo apt update -y
           sudo apt full-upgrade -y
           sudo apt install -y ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential \
