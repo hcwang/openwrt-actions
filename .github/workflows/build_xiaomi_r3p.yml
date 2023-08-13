@@ -18,10 +18,13 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
           echo $(pwd)
+          ./free_disk_space.sh
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /opt/ghc
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          
           sudo gem install apt-spy2
           sudo apt-spy2 check
           sudo apt-spy2 fix --commit
