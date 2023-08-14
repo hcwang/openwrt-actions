@@ -58,7 +58,7 @@ jobs:
     - name: Install feeds
       run: cd openwrt && ./scripts/feeds install -a
     - name: remove Nodes 
-      run: sed -i 's/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR||SOFT_FLOAT)/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR)/g' ./feeds/packages/lang/node/Makefile
+      run: sed -i 's/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR||SOFT_FLOAT)/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR)/g' ./openwrt/feeds/packages/lang/node/Makefile
     
     #- name: Update homebridge
     #  run: cd openwrt/package/feeds/packages && rm -fr node-homebridge && cp -r ../../../../node-homebridge . && cp -r ../../../../node-homebridge-config-ui-x . && cp -r ../../../../node-pty-prebuilt-multiarch .
