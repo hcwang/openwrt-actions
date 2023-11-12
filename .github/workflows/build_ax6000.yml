@@ -116,27 +116,17 @@ jobs:
             ./artifact/${{ steps.currentdate.outputs.date }}.bin
             ./artifact/**/*.ipk
     
-    #- name: executing remote ssh commands using ssh key
-    #  uses: appleboy/ssh-action@master
-    #  
-    #  with:
-    #    host: ${{ secrets.ssh_host }}
-    #    username: ${{ secrets.ssh_user }}
-    #    password: ${{ secrets.ssh_pass }}
-    #    port: ${{ secrets.ssh_port }}
-    #    script: |
-    #      curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/${{ steps.release-asset.outputs.automatic_releases_tag }}/${{ steps.currentdate.outputs.date }}.bin
-    #      nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
-    #- name: upload to my router and sysupgrade
-    #  uses: fifsky/ssh-action@master
-    #  with:
-    #    command: |
-    #      curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/${{ steps.release-asset.outputs.automatic_releases_tag }}/${{ steps.currentdate.outputs.date }}.bin
-    #      nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
-    #    host: ${{ secrets.ssh_host }}
-    #    user: ${{ secrets.ssh_user }}
-    #    pass: ${{ secrets.ssh_pass }}
-    #    port: ${{ secrets.ssh_port }}    
+    - name: executing remote ssh commands using ssh key
+      uses: appleboy/ssh-action@master
+      
+      with:
+        host: ${{ secrets.ssh_host }}
+        username: ${{ secrets.ssh_user }}
+        password: ${{ secrets.ssh_pass }}
+        port: ${{ secrets.ssh_port }}
+        script: |
+          curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/${{ steps.release-asset.outputs.automatic_releases_tag }}/${{ steps.currentdate.outputs.date }}.bin
+          nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
           
           
           
