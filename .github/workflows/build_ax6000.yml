@@ -43,7 +43,7 @@ jobs:
     
     - name: Add new feed from lienol
       run: |
-          cd ../.. && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+          cd openwrt && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
           
           
     
