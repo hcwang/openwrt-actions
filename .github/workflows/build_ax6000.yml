@@ -1,7 +1,7 @@
 name: redmi_ax6000
 on:
   schedule:
-    - cron: 1 15 * * 5
+    - cron: 1 15 * * 2
   push:
     branches: 
       - master
