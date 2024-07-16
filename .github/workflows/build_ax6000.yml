@@ -90,7 +90,8 @@ jobs:
           make -j1 V=s
     - name: Get current date
       id: currentdate
-      run: echo "::set-output name=date::$(date +'%Y-%m-%d.%H.%M')"
+      # run: echo "::set-output name=date::$(date +'%Y-%m-%d.%H.%M')"
+      run: echo "date=$(date +'%Y-%m-%d.%H.%M')" >> $GITHUB_OUTPUT
     - name: Assemble artifact
       run: |
           rm -rf ./artifact/
