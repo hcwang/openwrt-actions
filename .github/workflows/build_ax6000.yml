@@ -18,7 +18,7 @@ jobs:
         DEBIAN_FRONTEND: noninteractive
       run: |
           sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
-          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php*
+          sudo -E apt-get -y purge azure-cli ghc* llvm* firefox google* dotnet* powershell openjdk* mysql* php*
           sudo -E apt-get -qq update
           sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
           sudo -E apt-get -y autoremove --purge
