@@ -46,6 +46,9 @@ jobs:
       run: |
           cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
           cd ../.. && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+          rm -rf feeds/packages/net/{xray-core,v2ray-core,v2ray-geodata,sing-box}
+          git clone https://github.com/sbwml/openwrt_helloworld package/helloworld
+          
           
           
     
