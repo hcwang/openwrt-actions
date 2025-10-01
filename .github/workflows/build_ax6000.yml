@@ -22,9 +22,25 @@ jobs:
         sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
         sudo -E apt-mark hold grub-efi-amd64-signed
         sudo -E apt update
-        # sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* snap*
         sudo -E apt -y full-upgrade
         sudo -E apt -y install ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext genisoimage git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libfuse-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libpython3-dev libreadline-dev libssl-dev libtool llvm lrzsz msmtp ninja-build p7zip p7zip-full patch pkgconf python3 python3-pyelftools python3-setuptools qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        # ========== 新增的修复命令 ==========
+        # 1. 首先确认 clang++ 是否已安装及其路径
+        echo "检查 clang++ 是否可执行:"
+        which clang++ || echo "which 命令未找到 clang++"
+        echo "检查 /usr/bin/clang++ 是否存在:"
+        ls -la /usr/bin/clang++ || echo "/usr/bin/clang++ 文件不存在"
+
+        # 2. 使用更可靠的方法将 clang++ 路径加入 PATH（对所有后续步骤生效）
+        # 在 GitHub Actions 中，正确的方法是使用 $GITHUB_PATH 环境文件[6](@ref)
+        echo "/usr/bin" >> $GITHUB_PATH
+
+        # 3. 重新加载 PATH 并验证
+        source $GITHUB_ENV  # 可选，确保当前步骤也能识别新 PATH
+        echo "当前 PATH 环境变量:"
+        echo $PATH
+        echo "验证 clang++ 版本:"
+        clang++ --version || echo "clang++ 命令仍然不可用"
         sudo -E systemctl daemon-reload
         #sudo -E apt -y autoremove --purge
         sudo -E apt clean
