@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     #- name: install software
     #  uses: ConorMacBride/install-package@v1
@@ -29,19 +29,6 @@ jobs:
         sudo -E apt -y autoremove --purge
         sudo -E apt clean
         sudo -E timedatectl set-timezone "Asia/Shanghai"
-    - name: Install GCC-13 and set as default for build
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-13 g++-13 libstdc++-13-dev
-        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 100
-        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100
-        echo "CC=/usr/bin/gcc-13" >> $GITHUB_ENV
-        echo "CXX=/usr/bin/g++-13" >> $GITHUB_ENV
-        echo "HOSTCC=/usr/bin/gcc-13" >> $GITHUB_ENV
-        echo "HOSTCXX=/usr/bin/g++-13" >> $GITHUB_ENV
-        # 验证输出（可保留用于调试）
-        gcc --version
-        g++ --version
     - name: Checkout OpenWrt
       uses: actions/checkout@v4
 
