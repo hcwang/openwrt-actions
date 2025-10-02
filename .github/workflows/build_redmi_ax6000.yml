@@ -18,7 +18,21 @@ jobs:
           docker system prune -af || true
           docker image prune -af || true
           docker container prune -f || true
+          # 2) 删除不需要的预装 SDK/工具（按需选择，谨慎启用）
+          # Android SDK（~10GB+）
+          sudo rm -rf /usr/local/lib/android || true
+          # Haskell GHC（~8GB）
+          sudo rm -rf /opt/ghc || true
+          # .NET SDK（~1-2GB+）
+          sudo rm -rf /usr/share/dotnet || true
+          # Boost（~2-3GB）
+          sudo rm -rf /usr/local/share/boost || true
+          # 预装的工具缓存（/opt/hostedtoolcache，含各语言版本）
+          sudo rm -rf /opt/hostedtoolcache || true
 
+          # 3) 清理工作区/临时目录（如拉了大缓存/依赖）
+          rm -rf "$GITHUB_WORKSPACE"/.git || true
+          rm -rf "$RUNNER_TEMP"/* || true
           # 保留 apt 源，不删除 /etc/apt/sources.list.d
           sudo -E apt-mark hold grub-efi-amd64-signed
           sudo -E apt-get update
@@ -49,11 +63,11 @@ jobs:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
-          tool-cache: false
+          tool-cache: true
           android: true
           dotnet: true
           haskell: true
-          large-packages: false
+          large-packages: true
           swap-storage: true
 
       - name: Re-install modern Clang after cleanup
