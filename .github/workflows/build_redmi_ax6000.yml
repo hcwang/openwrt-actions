@@ -14,19 +14,33 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          docker rmi `docker images -q` || true
-          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+          # 更稳妥的 Docker 清理（空状态也不会报错）
+          docker system prune -af || true
+          docker image prune -af || true
+          docker container prune -f || true
+
+          # 保留 apt 源，不删除 /etc/apt/sources.list.d
           sudo -E apt-mark hold grub-efi-amd64-signed
-          sudo -E apt update
-          sudo -E apt -y full-upgrade
-          sudo -E apt -y install \
-            ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 \
-            ccache cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
-            genisoimage git libncurses5-dev libssl-dev python3 python3-distutils rsync subversion swig \
-            zlib1g-dev unzip file time jq upx-ucl p7zip-full aria2 wget texinfo qemu-utils libelf-dev \
-            libtool pkg-config
+          sudo -E apt-get update
+
+          # 启用 universe/multiverse，避免找不到包
+          sudo -E apt-get install -y software-properties-common
+          sudo -E add-apt-repository -y universe
+          sudo -E add-apt-repository -y multiverse
+          sudo -E apt-get update
+
+          # 基础依赖（去掉 24.04 已移除或不必要的包）
+          sudo -E apt-get install -y \
+            build-essential \
+            asciidoc autoconf automake autopoint binutils bison \
+            ccache cmake cpio curl device-tree-compiler flex gawk \
+            gettext git libncurses5-dev libssl-dev libelf-dev libtool \
+            pkg-config python3 rsync subversion swig \
+            zlib1g-dev unzip file time jq upx-ucl p7zip-full aria2 wget \
+            texinfo qemu-utils genisoimage
+
           sudo -E systemctl daemon-reload
-          sudo -E apt clean
+          sudo -E apt-get clean
           sudo -E timedatectl set-timezone "Asia/Shanghai"
 
       - name: Checkout OpenWrt
@@ -59,7 +73,7 @@ jobs:
       - name: Add new feed from lienol
         run: |
           cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
-          cd ../.. && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+          cd ../.. && rm -f feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
 
       - name: Update feeds
         run: cd openwrt && ./scripts/feeds update -a
@@ -125,7 +139,7 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
           prerelease: true
-          title: RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
+          title: RedMi_AX6000_${{ steps.currentdate.outputs.date }}
           files: |
             ./artifact/${{ steps.currentdate.outputs.date }}.bin
             ./artifact/**/*.ipk
