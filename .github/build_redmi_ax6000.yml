@@ -1,0 +1,142 @@
+name: redmi_ax6000_new
+on:
+  schedule:
+    - cron: '1 15 * * 2'
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Space cleanup and Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          docker rmi `docker images -q` || true
+          sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+          sudo -E apt-mark hold grub-efi-amd64-signed
+          sudo -E apt update
+          sudo -E apt -y full-upgrade
+          sudo -E apt -y install \
+            ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 \
+            ccache cmake cpio curl device-tree-compiler flex gawk gcc-multilib g++-multilib gettext \
+            genisoimage git libncurses5-dev libssl-dev python3 python3-distutils rsync subversion swig \
+            zlib1g-dev unzip file time jq upx-ucl p7zip-full aria2 wget texinfo qemu-utils libelf-dev \
+            libtool pkg-config
+          sudo -E systemctl daemon-reload
+          sudo -E apt clean
+          sudo -E timedatectl set-timezone "Asia/Shanghai"
+
+      - name: Checkout OpenWrt
+        uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          swap-storage: true
+
+      - name: Re-install modern Clang after cleanup
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev ninja-build
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+          clang++ --version
+
+      - name: Clone source code
+        env:
+          REPO_URL: https://github.com/coolsnowwolf/lede.git
+          REPO_BRANCH: master
+        run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+
+      - name: Add new feed from lienol
+        run: |
+          cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
+          cd ../.. && rm feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+
+      - name: Update feeds
+        run: cd openwrt && ./scripts/feeds update -a
+
+      - name: Install feeds
+        run: cd openwrt && ./scripts/feeds install -a
+
+      - name: remove Nodes
+        run: sed -i 's/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR||SOFT_FLOAT)/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR)/g' ./openwrt/feeds/packages/lang/node/Makefile
+
+      - name: Custom configure file
+        run: |
+          cd openwrt
+          rm -f .config
+          cp ../ax6000 .config
+
+      - name: Make Defconfig
+        run: |
+          cd openwrt
+          make defconfig
+
+      - name: Make download
+        run: |
+          cd openwrt
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+
+      - name: Multi-thread compile
+        run: |
+          cd openwrt
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+
+      - name: Single-thread compile
+        if: failure()
+        run: |
+          cd openwrt
+          make -j1 V=s
+
+      - name: Get current date
+        id: currentdate
+        run: echo "date=$(date +'%Y-%m-%d.%H.%M')" >> $GITHUB_OUTPUT
+
+      - name: Assemble artifact
+        run: |
+          rm -rf ./artifact/
+          mkdir -p ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
+          find openwrt/bin/targets/ -name "*.bin*" | xargs -i mv -f {} ./artifact/
+          mv -f openwrt/bin/packages ./artifact/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: OpenWrt firmware
+          path: ./artifact/
+
+      - name: Create Release and upload assets
+        id: release-asset
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
+          prerelease: true
+          title: RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
+          files: |
+            ./artifact/${{ steps.currentdate.outputs.date }}.bin
+            ./artifact/**/*.ipk
+
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.ssh_host }}
+          username: ${{ secrets.ssh_user }}
+          password: ${{ secrets.ssh_pass }}
+          port: ${{ secrets.ssh_port }}
+          script: |
+            curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/${{ steps.release-asset.outputs.automatic_releases_tag }}/${{ steps.currentdate.outputs.date }}.bin
+            nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
