@@ -71,13 +71,13 @@ jobs:
 
       
 
-      #- name: Re-install modern Clang after cleanup
-      #  run: |
-      #    sudo apt-get update
-      #    sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev ninja-build
-      #    sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
-      #    sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
-       #   clang++ --version
+      - name: Re-install modern Clang after cleanup
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev ninja-build
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+          clang++ --version
 
       - name: Clone source code
         env:
