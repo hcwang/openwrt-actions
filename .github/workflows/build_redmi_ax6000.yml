@@ -89,6 +89,9 @@ jobs:
         run: |
           cd openwrt/package/lean && rm -rf luci-theme-argon && git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
           cd ../.. && rm -f feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+          mkdir -p files/usr/share/v2ray && cd files/usr/share/v2ray && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+          
+          
 
       - name: Update feeds
         run: cd openwrt && ./scripts/feeds update -a
