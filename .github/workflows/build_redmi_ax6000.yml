@@ -158,9 +158,7 @@ jobs:
           name: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
           makeLatest: true
           generateReleaseNotes: true
-          artifacts: |
-            "./artifact/*.bin"
-            "./artifact/**/*.ipk"
+          artifacts: "./artifact/*.bin,./artifact/**/*.ipk"
           body: |
             ## Release Notes 
             - This release includes the firmware for RedMi AX6000 boards.
