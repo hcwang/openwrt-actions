@@ -152,19 +152,10 @@ jobs:
 
       - name: Create Release and upload assets
         id: release-asset
-        uses: marvinpinto/action-automatic-releases@latest
+        uses: ncipollo/release-action@v1
         with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
-          prerelease: true
-          title: RedMi_AX6000_${{ steps.currentdate.outputs.date }}
-          files: |
-            ./artifact/${{ steps.currentdate.outputs.date }}.bin
-            ./artifact/**/*.ipk
-      - uses: ncipollo/release-action@v1
-        with:
-          tag: "${{ steps.currentdate.outputs.date }}"
-          name: "${{ steps.currentdate.outputs.date }}"
+          tag: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
+          name: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
           makeLatest: true
           generateReleaseNotes: true
           artifacts: |
@@ -183,5 +174,5 @@ jobs:
           password: ${{ secrets.ssh_pass }}
           port: ${{ secrets.ssh_port }}
           script: |
-            curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/${{ steps.release-asset.outputs.automatic_releases_tag }}/${{ steps.currentdate.outputs.date }}.bin
+            curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/RedMi_AX6000_${{ steps.currentdate.outputs.date }}/${{ steps.currentdate.outputs.date }}.bin
             nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
