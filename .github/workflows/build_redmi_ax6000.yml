@@ -116,7 +116,9 @@ jobs:
       - name: Make download
         run: |
           cd openwrt
-          make download -j8
+          # 增加重试机制，处理偶发的网络问题
+          # 如果 j8 失败，降级到 j4，最后尝试 j1 并输出详细日志
+          make download -j8 || make download -j4 || make download -j1 V=s
           find dl -size -1024c -exec ls -l {} \;
           find dl -size -1024c -exec rm -f {} \;
 
