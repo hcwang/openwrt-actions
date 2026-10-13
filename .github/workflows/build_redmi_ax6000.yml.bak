@@ -1,0 +1,189 @@
+name: redmi_ax6000_new
+on:
+  schedule:
+    - cron: '1 15 * * 2'
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+      - name: Space cleanup and Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          # 更稳妥的 Docker 清理（空状态也不会报错）
+          docker system prune -af || true
+          docker image prune -af || true
+          docker container prune -f || true
+          # 2) 删除不需要的预装 SDK/工具（按需选择，谨慎启用）
+          # Android SDK（~10GB+）
+          sudo rm -rf /usr/local/lib/android || true
+          # Haskell GHC（~8GB）
+          sudo rm -rf /opt/ghc || true
+          # .NET SDK（~1-2GB+）
+          sudo rm -rf /usr/share/dotnet || true
+          # Boost（~2-3GB）
+          sudo rm -rf /usr/local/share/boost || true
+          # 预装的工具缓存（/opt/hostedtoolcache，含各语言版本）
+          sudo rm -rf /opt/hostedtoolcache || true
+
+          # 3) 清理工作区/临时目录（如拉了大缓存/依赖）
+          rm -rf "$GITHUB_WORKSPACE"/.git || true
+          rm -rf "$RUNNER_TEMP"/* || true
+          # 保留 apt 源，不删除 /etc/apt/sources.list.d
+          sudo -E apt-mark hold grub-efi-amd64-signed
+          sudo -E apt-get update
+
+          # 启用 universe/multiverse，避免找不到包
+          sudo -E apt-get install -y software-properties-common
+          sudo -E add-apt-repository -y universe
+          sudo -E add-apt-repository -y multiverse
+          sudo -E apt-get update
+
+          # 基础依赖（去掉 24.04 已移除或不必要的包）
+          sudo -E apt-get install -y \
+            build-essential \
+            asciidoc autoconf automake autopoint binutils bison \
+            ccache cmake cpio curl device-tree-compiler flex gawk \
+            gettext git libncurses5-dev libssl-dev libelf-dev libtool \
+            pkg-config python3 rsync subversion swig \
+            zlib1g-dev unzip file time jq upx-ucl p7zip-full aria2 wget \
+            texinfo qemu-utils genisoimage
+
+          sudo -E systemctl daemon-reload
+          sudo -E apt-get clean
+          sudo -E timedatectl set-timezone "Asia/Shanghai"
+
+      - name: Checkout OpenWrt
+        uses: actions/checkout@v4
+
+
+
+      - name: Re-install modern Clang after cleanup
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev ninja-build
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+          clang++ --version
+
+      - name: Clone source code
+        env:
+          REPO_URL: https://github.com/coolsnowwolf/lede.git
+          REPO_BRANCH: master
+        run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+
+      - name: Add new feed from lienol
+        run: |
+          cd openwrt/package/lean && rm -rf luci-theme-argon && git clone https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
+          cd ../.. && rm -f feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
+          mkdir -p files/usr/share/v2ray && cd files/usr/share/v2ray && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+
+
+
+      - name: Update feeds
+        run: cd openwrt && ./scripts/feeds update -a
+
+      - name: Install feeds
+        run: cd openwrt && ./scripts/feeds install -a
+
+      - name: remove Nodes
+        run: sed -i 's/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR||SOFT_FLOAT)/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR)/g' ./openwrt/feeds/packages/lang/node/Makefile
+
+      - name: Disable manpages for kmod
+        run: |
+          # Patch kmod Makefile to disable manpages build to avoid requiring scdoc
+          # This is needed because scdoc is not available in the build environment
+          # and manpages are not required for the router firmware
+          cd openwrt/feeds/packages/utils/kmod
+          if ! grep -q "disable-manpages" Makefile; then
+            # Use awk to insert CONFIGURE_ARGS after the package.mk include line
+            # Note: \$ and \. are escaped for shell/regex matching
+            awk '/^include \$\(INCLUDE_DIR\)\/package\.mk/ {print; print ""; print "CONFIGURE_ARGS += --disable-manpages"; next} 1' Makefile > Makefile.tmp
+            mv Makefile.tmp Makefile
+          fi
+
+      - name: Custom configure file
+        run: |
+          cd openwrt
+          rm -f .config
+          cp ../ax6000 .config
+
+      - name: Make Defconfig
+        run: |
+          cd openwrt
+          make defconfig
+
+      - name: Make download
+        run: |
+          cd openwrt
+          make download -j8
+          find dl -size -1024c -exec ls -l {} \;
+          find dl -size -1024c -exec rm -f {} \;
+
+      - name: Multi-thread compile
+        run: |
+          cd openwrt
+          echo -e "$(nproc) thread build."
+          make -j$(nproc) V=s
+
+      - name: Single-thread compile
+        if: failure()
+        run: |
+          cd openwrt
+          make -j1 V=s
+
+      - name: Get current date
+        id: currentdate
+        run: echo "date=$(date +'%Y-%m-%d.%H.%M')" >> $GITHUB_OUTPUT
+
+      - name: Assemble artifact
+        run: |
+          rm -rf ./artifact/
+          mkdir -p ./artifact/
+          find openwrt/bin/targets/ -name "*sysupgrade*bin*" | xargs -i mv -f {} ./artifact/${{ steps.currentdate.outputs.date }}.bin
+          find openwrt/bin/targets/ -name "*.bin*" | xargs -i mv -f {} ./artifact/
+          mv -f openwrt/bin/packages ./artifact/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: OpenWrt firmware
+          path: ./artifact/
+
+      - name: Create Release and upload assets
+        id: release-asset
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
+          name: "RedMi_AX6000_${{ steps.currentdate.outputs.date }}"
+          makeLatest: true
+          generateReleaseNotes: true
+          artifacts: "./artifact/*.bin,./artifact/**/*.ipk"
+          body: |
+            ## Release Notes
+            - This release includes the firmware for RedMi AX6000 boards.
+            - Please find the binary files in the assets section below.
+
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.ssh_host }}
+          username: ${{ secrets.ssh_user }}
+          password: ${{ secrets.ssh_pass }}
+          port: ${{ secrets.ssh_port }}
+          script: |
+            curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/RedMi_AX6000_${{ steps.currentdate.outputs.date }}/${{ steps.currentdate.outputs.date }}.bin
+            nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &

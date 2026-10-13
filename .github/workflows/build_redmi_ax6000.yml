@@ -40,7 +40,6 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache || true
 
           # 3) 清理工作区/临时目录（如拉了大缓存/依赖）
-          rm -rf "$GITHUB_WORKSPACE"/.git || true
           rm -rf "$RUNNER_TEMP"/* || true
           # 保留 apt 源，不删除 /etc/apt/sources.list.d
           sudo -E apt-mark hold grub-efi-amd64-signed
@@ -89,7 +88,7 @@ jobs:
         run: |
           cd openwrt/package/lean && rm -rf luci-theme-argon && git clone https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
           cd ../.. && rm -f feeds.conf.default && cp ../feeds.conf.default feeds.conf.default
-          mkdir -p files/usr/share/v2ray && cd files/usr/share/v2ray && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+          mkdir -p files/usr/share/v2ray files/usr/share/xray && cd files/usr/share/v2ray && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat && wget https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat && cp geoip.dat geosite.dat ../xray/
           
           
 
@@ -185,5 +184,10 @@ jobs:
           password: ${{ secrets.ssh_pass }}
           port: ${{ secrets.ssh_port }}
           script: |
-            curl -4 -o /tmp/${{ steps.currentdate.outputs.date }}.bin -L https://github.com/hcwang/openwrt-actions/releases/download/RedMi_AX6000_${{ steps.currentdate.outputs.date }}/${{ steps.currentdate.outputs.date }}.bin
-            nohup sysupgrade -v /tmp/${{ steps.currentdate.outputs.date }}.bin>/dev/null  2>&1 &
+            TARGET="/tmp/${{ steps.currentdate.outputs.date }}.bin"
+            curl -4 -f -o "$TARGET" -L https://github.com/hcwang/openwrt-actions/releases/download/RedMi_AX6000_${{ steps.currentdate.outputs.date }}/${{ steps.currentdate.outputs.date }}.bin
+            if [ -s "$TARGET" ]; then
+              nohup sysupgrade -v "$TARGET" >/dev/null 2>&1 &
+            else
+              echo "Downloaded firmware is empty or missing, aborting sysupgrade." && exit 1
+            fi

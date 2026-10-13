@@ -8,11 +8,11 @@ src-git freifunk https://github.com/freifunk/openwrt-packages.git
 src-git management https://github.com/openwrt-management/packages.git
 #src-git oldpackages http://git.openwrt.org/packages.git
 src-link custom /usr/src/openwrt/custom-feed
-src-git helloworld https://github.com/fw876/helloworld.git
+#src-git helloworld https://github.com/fw876/helloworld.git
 
-src-git kenzo https://github.com/kenzok8/openwrt-packages
+#src-git kenzo https://github.com/kenzok8/openwrt-packages
 src-git small https://github.com/kenzok8/small
 #src-git passwall_packages https://github.com/xiaorouji/openwrt-passwall-packages.git;main
 #src-git passwall2 https://github.com/xiaorouji/openwrt-passwall2.git;main
-src-git passwall_packages https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git;main
-src-git passwall_luci https://github.com/Openwrt-Passwall/openwrt-passwall.git;main
+#src-git passwall_packages https://github.com/Openwrt-Passwall/openwrt-passwall-packages.git;main
+#src-git passwall_luci https://github.com/Openwrt-Passwall/openwrt-passwall.git;main
