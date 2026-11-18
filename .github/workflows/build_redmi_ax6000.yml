@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,7 +14,7 @@ jobs:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
         with:
-          tool-cache: true
+          preinstalled-runtimes: true
           android: true
           dotnet: true
           haskell: true
@@ -96,7 +97,14 @@ jobs:
         run: cd openwrt && ./scripts/feeds update -a
 
       - name: Install feeds
-        run: cd openwrt && ./scripts/feeds install -a
+        run: |
+          cd openwrt && ./scripts/feeds install -a
+          for pkg in luci luci-base luci-mod-admin-full luci-mod-network luci-mod-status luci-mod-system; do
+            if [ ! -f "package/feeds/luci/$pkg/Makefile" ]; then
+              echo "ERROR: Required LuCI package '$pkg' is missing after feeds install!" >&2
+              exit 1
+            fi
+          done
 
       - name: remove Nodes
         run: sed -i 's/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR||SOFT_FLOAT)/DEPENDS:=@(HAS_FPU||KERNEL_MIPS_FPU_EMULATOR)/g' ./openwrt/feeds/packages/lang/node/Makefile
