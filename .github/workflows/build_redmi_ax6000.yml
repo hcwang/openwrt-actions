@@ -1,7 +1,8 @@
 name: redmi_ax6000_new
 on:
   schedule:
-    - cron: '1 15 * * 2'
+    # 北京时间每周三 04:23 触发（UTC 周二 20:23）：避开整点排队高峰，加上 ~2h10m 编译发版耗时，预计北京时间周三 07:00 左右完成
+    - cron: '23 20 * * 2'
   push:
     branches:
       - master
@@ -18,66 +19,44 @@ jobs:
           android: true
           dotnet: true
           haskell: true
-          large-packages: true
+          large-packages: false
           swap-storage: true
       - name: Space cleanup and Initialization environment
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          # 更稳妥的 Docker 清理（空状态也不会报错）
-          docker system prune -af || true
-          docker image prune -af || true
-          docker container prune -f || true
-          # 2) 删除不需要的预装 SDK/工具（按需选择，谨慎启用）
-          # Android SDK（~10GB+）
-          sudo rm -rf /usr/local/lib/android || true
-          # Haskell GHC（~8GB）
-          sudo rm -rf /opt/ghc || true
-          # .NET SDK（~1-2GB+）
-          sudo rm -rf /usr/share/dotnet || true
-          # Boost（~2-3GB）
+          # 删除 Boost 预装目录与临时目录（其余大目录已由 free-disk-space 快速清理，保留已预装的 clang-18/cmake 等工具）
           sudo rm -rf /usr/local/share/boost || true
-          # 预装的工具缓存（/opt/hostedtoolcache，含各语言版本）
-          sudo rm -rf /opt/hostedtoolcache || true
-
-          # 3) 清理工作区/临时目录（如拉了大缓存/依赖）
           rm -rf "$RUNNER_TEMP"/* || true
-          # 保留 apt 源，不删除 /etc/apt/sources.list.d
+
+          # 若 apt mirror 列表包含限速严重的 AWS EC2 镜像且存在备用官方源，则移除 EC2 镜像以避免 50KB/s 慢速下载
+          if [ -f /etc/apt/apt-mirrors.txt ] && [ "$(wc -l < /etc/apt/apt-mirrors.txt)" -gt 1 ]; then
+            sudo sed -i '/\.ec2\.archive\.ubuntu\.com/d' /etc/apt/apt-mirrors.txt || true
+          fi
+
           sudo -E apt-mark hold grub-efi-amd64-signed
           sudo -E apt-get update
 
-          # 启用 universe/multiverse，避免找不到包
-          sudo -E apt-get install -y software-properties-common
-          sudo -E add-apt-repository -y universe
-          sudo -E add-apt-repository -y multiverse
-          sudo -E apt-get update
-
-          # 基础依赖（去掉 24.04 已移除或不必要的包）
-          sudo -E apt-get install -y \
+          # 使用 --no-install-recommends 避免 asciidoc 连带安装 ~1.4GB 的 texlive/openjdk/mupdf 推荐包，并一次性装齐 Clang 18
+          sudo -E apt-get install -y --no-install-recommends \
             build-essential \
             asciidoc autoconf automake autopoint binutils bison \
             ccache cmake cpio curl device-tree-compiler flex gawk \
             gettext git libncurses5-dev libssl-dev libelf-dev libtool \
             pkg-config python3 rsync subversion swig \
             zlib1g-dev unzip file time jq upx-ucl p7zip-full aria2 wget \
-            texinfo qemu-utils genisoimage
+            texinfo qemu-utils genisoimage \
+            clang-18 lld-18 libc++-18-dev libc++abi-18-dev ninja-build
 
-          sudo -E systemctl daemon-reload
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
+          clang++ --version
+
           sudo -E apt-get clean
           sudo -E timedatectl set-timezone "Asia/Shanghai"
 
       - name: Checkout OpenWrt
         uses: actions/checkout@v4
-
-      
-
-      - name: Re-install modern Clang after cleanup
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y clang-18 lld-18 libc++-18-dev libc++abi-18-dev ninja-build
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 100
-          clang++ --version
 
       - name: Clone source code
         env:
@@ -122,6 +101,32 @@ jobs:
             mv Makefile.tmp Makefile
           fi
 
+      - name: Fix upstream build issues
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          # 1) Fix coolsnowwolf/lede b77bd85 verbose.mk regression breaking json_overview_image_info.py
+          json_script = Path("openwrt/scripts/json_overview_image_info.py")
+          if json_script.is_file():
+              content = json_script.read_text()
+              target = '"val.ARCH_PACKAGES",\n        ],'
+              replacement = '"val.ARCH_PACKAGES",\n            "V=s",\n        ],'
+              if '"V=s"' not in content and target in content:
+                  json_script.write_text(content.replace(target, replacement, 1))
+                  print("Patched scripts/json_overview_image_info.py to pass V=s")
+
+          # 2) Fix tools/dwarves parallel build race while tools/cmake is mid-install
+          tools_mk = Path("openwrt/tools/Makefile")
+          if tools_mk.is_file():
+              content = tools_mk.read_text()
+              old_dep = "$(curdir)/dwarves/compile += $(curdir)/elfutils/compile\n"
+              new_dep = "$(curdir)/dwarves/compile += $(curdir)/elfutils/compile $(curdir)/cmake/compile\n"
+              if old_dep in content:
+                  tools_mk.write_text(content.replace(old_dep, new_dep, 1))
+                  print("Patched tools/Makefile: added cmake dependency for dwarves")
+          PY
+
       - name: Custom configure file
         run: |
           cd openwrt
@@ -144,7 +149,7 @@ jobs:
         run: |
           cd openwrt
           echo -e "$(nproc) thread build."
-          make -j$(nproc) V=s
+          make -j$(nproc)
 
       - name: Single-thread compile
         if: failure()
