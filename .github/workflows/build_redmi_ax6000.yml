@@ -125,6 +125,16 @@ jobs:
               if old_dep in content:
                   tools_mk.write_text(content.replace(old_dep, new_dep, 1))
                   print("Patched tools/Makefile: added cmake dependency for dwarves")
+
+          # 3) Add GitHub codeload primary mirror for tools/erofs-utils (git.kernel.org snapshot blocks/timeouts runner IPs)
+          erofs_mk = Path("openwrt/tools/erofs-utils/Makefile")
+          if erofs_mk.is_file():
+              content = erofs_mk.read_text()
+              old_url = "PKG_SOURCE_URL=https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/snapshot/"
+              new_url = "PKG_SOURCE_URL=https://codeload.github.com/erofs/erofs-utils/tar.gz/v$(PKG_VERSION)? https://git.kernel.org/pub/scm/linux/kernel/git/xiang/erofs-utils.git/snapshot/"
+              if "codeload.github.com/erofs/erofs-utils" not in content and old_url in content:
+                  erofs_mk.write_text(content.replace(old_url, new_url, 1))
+                  print("Patched tools/erofs-utils/Makefile: added GitHub codeload mirror")
           PY
 
       - name: Custom configure file
