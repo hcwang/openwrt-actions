@@ -1,8 +1,11 @@
 name: redmi_ax6000_new
 on:
   schedule:
-    # 北京时间每周三 04:23 触发（UTC 周二 20:23）：避开整点排队高峰，加上 ~2h10m 编译发版耗时，预计北京时间周三 07:00 左右完成
-    - cron: '23 20 * * 2'
+    # GitHub Actions cron 固定使用 UTC 时区（UTC+0，比北京时间慢 8 小时）：
+    # - 设定 UTC 周二 15:07（对应北京时间周二 23:07）
+    # - 结合 GitHub Actions schedule 实测约 7h10m~7h45m 的调度延迟，实际在 UTC 周二 22:20~22:50（北京时间周三 06:20~06:50）启动
+    # - 加上约 1h30m 编译发版耗时，预计在北京时间每周三早上 08:00 左右（UTC 周三 00:00 左右）执行完成
+    - cron: '7 15 * * 2'
   push:
     branches:
       - master
@@ -135,6 +138,47 @@ jobs:
               if "codeload.github.com/erofs/erofs-utils" not in content and old_url in content:
                   erofs_mk.write_text(content.replace(old_url, new_url, 1))
                   print("Patched tools/erofs-utils/Makefile: added GitHub codeload mirror")
+
+          # 4) Fix mac80211 backports-6.18.39 build against Linux >= 6.18.65
+          #    Linux 6.18.65 backported e3b2cf6e5dba ("kernfs: pass struct ns_common instead of const void *"),
+          #    changing struct class::namespace return type from `const void *` to `const struct ns_common *`.
+          mac80211_patches = Path("openwrt/package/kernel/mac80211/patches")
+          if mac80211_patches.is_dir():
+              existing_sysfs = mac80211_patches / "build" / "150-sysfs-backport.patch"
+              if existing_sysfs.is_file():
+                  txt = existing_sysfs.read_text()
+                  if "LINUX_VERSION_IS_GEQ(7,0,0)" in txt:
+                      existing_sysfs.write_text(txt.replace("LINUX_VERSION_IS_GEQ(7,0,0)", "LINUX_VERSION_IS_GEQ(6,18,65)"))
+                      print("Updated mac80211 150-sysfs-backport.patch threshold to 6.18.65")
+              elif not any("wiphy_namespace" in p.read_text(errors="ignore") for p in mac80211_patches.rglob("*.patch")):
+                  patch_file = mac80211_patches / "build" / "503-fix-wiphy-namespace-6.18.65.patch"
+                  patch_file.write_text(
+                      "--- a/net/wireless/sysfs.c\n"
+                      "+++ b/net/wireless/sysfs.c\n"
+                      "@@ -154,12 +154,21 @@ static SIMPLE_DEV_PM_OPS(wiphy_pm_ops, w\n"
+                      " #define WIPHY_PM_OPS NULL\n"
+                      " #endif\n"
+                      " \n"
+                      "+#if LINUX_VERSION_IS_GEQ(6,18,65)\n"
+                      "+static const struct ns_common *wiphy_namespace(const struct device *d)\n"
+                      "+{\n"
+                      "+\tstruct wiphy *wiphy = container_of(d, struct wiphy, dev);\n"
+                      "+\n"
+                      "+\treturn to_ns_common(wiphy_net(wiphy));\n"
+                      "+}\n"
+                      "+#else\n"
+                      " static const void *wiphy_namespace(const struct device *d)\n"
+                      " {\n"
+                      " \tstruct wiphy *wiphy = container_of(d, struct wiphy, dev);\n"
+                      " \n"
+                      " \treturn wiphy_net(wiphy);\n"
+                      " }\n"
+                      "+#endif\n"
+                      " \n"
+                      " struct class ieee80211_class = {\n"
+                      " \t.name = \"ieee80211\",\n"
+                  )
+                  print("Added mac80211 build/503-fix-wiphy-namespace-6.18.65.patch")
           PY
 
       - name: Custom configure file
